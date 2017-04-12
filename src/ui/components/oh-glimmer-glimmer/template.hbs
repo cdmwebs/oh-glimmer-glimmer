@@ -1,3 +1,32 @@
 <div class="container">
-  <graph-calendar @days={{days}} @months={{months}} />
+  <graph-calendar @rows={{rows}} @columns={{columns}} @data={{data}} />
+
+  <div class="container-buttons">
+    <div class="container-action-buttons">
+    {{#if isPlaying}}
+      <g-button class="container-action-button" @on-click={{action pause}} @title="Pause" />
+    {{else}}
+      <g-button class="container-action-button" @on-click={{action play}} @title="Play" />
+    {{/if}}
+    </div>
+
+    <div class="container-interval-buttons">
+      <div class="container-interval-buttons__buttons">
+        <g-button class="container-interval-buttons__button" @on-click={{action inreaseUpdateInterval}} @title="+" />
+        <g-button class="container-interval-buttons__button" @on-click={{action decreaseUpdateInterval}} @title="-" />
+      </div>
+
+      <div class="container-interval-buttons__update">
+        {{framePerSecond}}fps
+      </div>
+    </div>
+
+    <div class="container-magic-buttons">
+      {{#if isDefaultMode}}
+        <g-button class="container-magic-button" @on-click={{action doMagicTrick}} @title="Magic Trick" />
+      {{else}}
+        <g-button class="container-magic-button" @on-click={{action setDefaultMode}} @title="Default Mode" />
+      {{/if}}
+    </div>
+  </div>
 </div>
