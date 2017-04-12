@@ -10,6 +10,20 @@
     {{/if}}
     </div>
 
+    <div class="container-magic-buttons">
+      {{#if loading}}
+        <div class="container-magic-button__loading">
+          Loading...
+        </div>
+      {{else}}
+        {{#if isDefaultMode}}
+          <g-button class="container-magic-button" @on-click={{action doMagicTrick}} @title="Magic Trick" />
+        {{else}}
+          <g-button class="container-magic-button" @on-click={{action setDefaultMode}} @title="Default Mode" />
+        {{/if}}
+      {{/if}}
+    </div>
+
     <div class="container-interval-buttons">
       <div class="container-interval-buttons__buttons">
         <g-button class="container-interval-buttons__button" @on-click={{action inreaseUpdateInterval}} @title="+" />
@@ -19,14 +33,6 @@
       <div class="container-interval-buttons__update">
         {{framePerSecond}}fps
       </div>
-    </div>
-
-    <div class="container-magic-buttons">
-      {{#if isDefaultMode}}
-        <g-button class="container-magic-button" @on-click={{action doMagicTrick}} @title="Magic Trick" />
-      {{else}}
-        <g-button class="container-magic-button" @on-click={{action setDefaultMode}} @title="Default Mode" />
-      {{/if}}
     </div>
   </div>
 </div>

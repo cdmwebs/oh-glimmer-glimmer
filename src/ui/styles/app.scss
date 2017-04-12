@@ -9,6 +9,8 @@
 }
 
 .container-buttons {
+  position: fixed;
+  bottom: 0;
   margin: 20px;
   display: flex;
   align-items: flex-start;
@@ -43,6 +45,13 @@
 
 .container-interval-buttons__button {
   margin-right: 10px;
+}
+
+.container-magic-button__loading {
+  min-width: 130px;
+  height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 .graph-calendar-day {

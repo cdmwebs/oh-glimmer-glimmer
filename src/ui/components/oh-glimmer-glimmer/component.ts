@@ -3,6 +3,7 @@ import ImagePixelExtractor from './image-pixel-extractor';
 
 const MODE_DEFAULT = 'default';
 const MODE_MAGIC = 'magic';
+const MODE_STATIC = 'static';
 
 const STATE_PLAYING = 'playing';
 const STATE_PAUSED = 'paused';
@@ -29,9 +30,10 @@ const getRandomInt = (min: number = 0, max: number = 10) => {
 
 export default class OhGlimmerGlimmer extends Component {
   private intervalId: number;
-  private initialized: boolean;
   private imagePath: string;
+  private allowedCoordinates: any;
 
+  @tracked loading: boolean;
   @tracked rows: Array<string>;
   @tracked columns: Array<string>;
   @tracked mode: string;
@@ -53,15 +55,18 @@ export default class OhGlimmerGlimmer extends Component {
   constructor(options) {
     super(options);
 
-    this.mode = MODE_DEFAULT;
-    this.initialized = false;
+    this.allowedCoordinates = [];
+    this.loading = false;
+    this.mode = MODE_STATIC;
     this.intervalId = null;
     this.rows = Array(40).fill(0);
     this.columns = Array(150).fill(0);
     this.state = STATE_PAUSED;
-    this.framePerSecond = 60;
+    this.framePerSecond = 30;
     this.updateAtOnceAmount = 40;
     this.imagePath = 'glimmer_text_40.png';
+
+    this.renderImage('glimmer_40.png');
   }
 
   private setupInterval() {
@@ -70,34 +75,17 @@ export default class OhGlimmerGlimmer extends Component {
 
   private update() {
     let data: Array<any> = this.data || [];
-    let currentRandomDay: number = getRandomInt(0, this.rows.length);
-    let currentRandomMonth: Array<number> = Array(this.updateAtOnceAmount).fill(0).map(() => getRandomInt(0, this.columns.length));
+    let allowedCoordinates = this.allowedCoordinates;
+    let currentRandomMonth: Array<number> = Array(this.updateAtOnceAmount).fill(0).map(() => getRandomInt(0, allowedCoordinates.length - 1));
 
-    this.rows.forEach((row, rowIndex) => {
-      if (this.initialized && currentRandomDay !== rowIndex) {
-        return;
-      }
+    if (this.allowedCoordinates.length) {
+      for (let i = 0; i < this.updateAtOnceAmount; i++) {
+        const index = currentRandomMonth[i];
+        let [columnIndex, rowIndex] = allowedCoordinates[index];
 
-      if (!data[rowIndex]) {
-        data[rowIndex] = [];
-      }
-
-      this.columns.forEach((column, columnIndex) => {
-        if (this.initialized && currentRandomMonth.indexOf(columnIndex) === -1) {
-          return;
-        }
-
-        if (!data[rowIndex][columnIndex]) {
-          data[rowIndex][columnIndex] = [];
-        }
-
-        if (this.mode === MODE_MAGIC) {
+        if (this.mode === MODE_MAGIC || this.mode === MODE_STATIC) {
           let _item = data[rowIndex][columnIndex];
-          let {r, g, b, a, direction, ignore} = _item;
-
-          if (ignore) {
-            return;
-          }
+          let {r, g, b, a, direction} = _item;
 
           if (a <= 0.2) {
             direction = 'up';
@@ -115,13 +103,7 @@ export default class OhGlimmerGlimmer extends Component {
         } else {
           data[rowIndex][columnIndex] = COLORS[getRandomInt(0, 6)];
         }
-      });
-    });
-
-    this.data = data;
-
-    if (!this.initialized) {
-      this.initialized = true;
+      }
     }
   }
 
@@ -166,19 +148,37 @@ export default class OhGlimmerGlimmer extends Component {
 
   setDefaultMode() {
     this.mode = MODE_DEFAULT;
+
+    this.rows = Array(40).fill(0);
+    this.columns = Array(150).fill(0);
+
+    let _allowedCoordinates = [];
+
+    this.rows.forEach((row, rowIndex) => {
+      this.columns.forEach((column, columnIndex) => {
+        _allowedCoordinates.push([columnIndex, rowIndex]);
+      });
+    });
+
+    this.allowedCoordinates = _allowedCoordinates;
   }
 
   doMagicTrick() {
     this.mode = MODE_MAGIC;
+    this.renderImage(this.imagePath);
+  }
 
+  private renderImage(imagePath) {
     this.pause();
+    this.loading = true;
 
     let image = new ImagePixelExtractor();
 
-    image.process(this.imagePath).then(({ image, data }) => {
+    image.process(imagePath).then(({ image, data }) => {
       const rows = Array(image.height).fill(0);
       const columns = Array(image.width).fill(0);
       let _data = [];
+      let _allowedCoordinates = [];
 
       // iterate over all pixels based on x and y coordinates
       for (let y = 0; y < image.height; y++) {
@@ -200,6 +200,10 @@ export default class OhGlimmerGlimmer extends Component {
           const ignore = a <= 0.4 || (r === 255 && g === 255 && b === 255);
           const color = `${r}, ${g}, ${b}, ${a}`;
 
+          if (!ignore) {
+            _allowedCoordinates.push([x, y])
+          }
+
           _data[y][x] = {
             style: `background: rgba(${color});`,
             r, g, b, a, direction, ignore
@@ -210,8 +214,10 @@ export default class OhGlimmerGlimmer extends Component {
       this.rows = rows;
       this.columns = columns;
       this.data = _data;
+      this.allowedCoordinates = _allowedCoordinates;
 
       this.play();
+      this.loading = false;
     });
   }
 }
