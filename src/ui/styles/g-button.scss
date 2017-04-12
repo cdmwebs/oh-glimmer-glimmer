@@ -1,0 +1,18 @@
+.g-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3498db;
+  color: #FFF;
+  border: 0;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.g-button__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
