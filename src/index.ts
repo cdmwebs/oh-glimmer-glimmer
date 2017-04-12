@@ -1,5 +1,6 @@
 import App from './main';
 import { ComponentManager, setPropertyDidChange } from '@glimmer/component';
+import initializeCustomElements from '@glimmer/web-component';
 
 const app = new App();
 const containerElement = document.getElementById('app');
@@ -17,3 +18,4 @@ app.registerInitializer({
 app.renderComponent('oh-glimmer-glimmer', containerElement, null);
 
 app.boot();
+initializeCustomElements(app, ['g-button']);

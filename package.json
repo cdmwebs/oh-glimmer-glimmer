@@ -19,6 +19,7 @@
     "@glimmer/web-component": "^0.1.2",
     "ember-cli": "github:ember-cli/ember-cli",
     "ember-cli-inject-live-reload": "^1.6.1",
+    "rsvp": "^3.5.0",
     "typescript": "^2.2.2"
   },
   "engines": {
