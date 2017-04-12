@@ -1,0 +1,19 @@
+<div>
+  <div>
+    {{#each @months key="@index" as |month|}}
+      {{month}}
+    {{/each}}
+  </div>
+
+  <div>
+    {{#each @days key="@index" as |day|}}
+      <div>
+        {{day}}
+
+        {{#each @months key="@index" as |month|}}
+          [_]
+        {{/each}}
+      </div>
+    {{/each}}
+  </div>
+</div>
