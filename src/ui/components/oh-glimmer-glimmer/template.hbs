@@ -11,27 +11,23 @@
     </div>
 
     <div class="container-magic-buttons">
-      {{#if loading}}
-        <div class="container-magic-button__loading">
-          Loading...
-        </div>
+      {{#if isDefaultMode}}
+        <g-button class="container-magic-button" @on-click={{action doMagicTrick}} @title={{buttonText}} />
       {{else}}
-        {{#if isDefaultMode}}
-          <g-button class="container-magic-button" @on-click={{action doMagicTrick}} @title="Magic Trick" />
-        {{else}}
-          <g-button class="container-magic-button" @on-click={{action setDefaultMode}} @title="Default Mode" />
-        {{/if}}
+        <g-button class="container-magic-button" @on-click={{action setDefaultMode}} @title={{buttonText}} />
       {{/if}}
     </div>
 
     <div class="container-interval-buttons">
-      <div class="container-interval-buttons__buttons">
-        <g-button class="container-interval-buttons__button" @on-click={{action inreaseUpdateInterval}} @title="+" />
-        <g-button class="container-interval-buttons__button" @on-click={{action decreaseUpdateInterval}} @title="-" />
-      </div>
+      <div class="container-interval-buttons__block">
+        <div class="container-interval-buttons__buttons">
+          <g-button class="container-interval-buttons__button" @on-click={{action inreaseUpdateInterval}} @title="+" />
+          <g-button class="container-interval-buttons__button" @on-click={{action decreaseUpdateInterval}} @title="-" />
+        </div>
 
-      <div class="container-interval-buttons__update">
-        {{framePerSecond}}fps
+        <div class="container-interval-buttons__update">
+          {{framePerSecond}}fps
+        </div>
       </div>
     </div>
   </div>

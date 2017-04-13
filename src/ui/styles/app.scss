@@ -13,29 +13,55 @@
   bottom: 0;
   margin: 20px;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   flex: 1 1 auto;
-  min-width: 968px;
   align-self: center;
+  flex-wrap: wrap;
 }
 
 .container-action-buttons {
+  display: flex;
   margin-right: 20px;
+  margin-bottom: 20px;
+  min-width: 150px;
+  flex: 1;
 }
 
 .container-action-button {
   min-width: 120px;
+  flex: 1;
+}
+
+.container-magic-buttons {
+  display: flex;
+  flex: 1;
+}
+
+.container-magic-button {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  min-width: 150px;
+}
+
+.container-magic-button__loading {
+  min-width: 130px;
+  height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 .container-interval-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex: 1;
+  margin-bottom: 20px;
+  margin-right: 20px;
 }
 
-.container-interval-buttons__update {
-  margin-top: 10px;
+.container-interval-buttons__block {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .container-interval-buttons__buttons {
@@ -47,18 +73,10 @@
   margin-right: 10px;
 }
 
-.container-magic-button__loading {
-  min-width: 130px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-}
-
 .graph-calendar-day {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 968px;
   margin: 20px auto;
 }
 
@@ -73,4 +91,34 @@
   margin: 1px;
 }
 
-@import './g-button.scss';
+.g-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3498db;
+  color: #FFF;
+  border: 0;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.g-button__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media only screen
+and (min-width: 1px)
+and (max-width: 736px) {
+  .graph-calendar-day__value {
+    display: flex;
+    width: 6px;
+    height: 6px;
+    margin: 1px;
+  }
+}
+

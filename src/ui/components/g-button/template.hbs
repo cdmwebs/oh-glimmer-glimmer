@@ -1,5 +1,9 @@
 <button class="g-button" onclick={{action onClick}}>
   <div class="g-button__container">
-    {{title}}
+    {{#if @title}}
+      {{@title}}
+    {{else}}
+      Click me
+    {{/if}}
   </div>
 </button>

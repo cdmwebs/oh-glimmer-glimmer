@@ -1,5 +1,7 @@
 import Component, {tracked} from "@glimmer/component";
-import ImagePixelExtractor from './image-pixel-extractor';
+import ImagePixelExtractor from '../../../utils/image-pixel-extractor';
+import getRandomInt from '../../../utils/random-int';
+import getRandomColor from '../../../utils/random-color';
 
 const MODE_DEFAULT = 'default';
 const MODE_MAGIC = 'magic';
@@ -11,26 +13,17 @@ const STATE_PAUSED = 'paused';
 const LOWER_UPDATE_INTERVAL = 2;
 const UPPER_UPDATE_INTERVAL = 1024;
 
-const COLORS = {
-  0: {style: 'background: #EFEFEF;'},
-  1: {style: 'background: #65E560;'},
-  2: {style: 'background: #47C541;'},
-  3: {style: 'background: #30A82A;'},
-  4: {style: 'background: #288B24;'},
-  5: {style: 'background: #288B24;'},
-  6: {style: 'background: #8AFF87;'},
-};
+const DEFAULT_FPS = 30;
+const DEFAULT_UPDATE_POINTS_AMOUNT = 40;
 
-const getRandomInt = (min: number = 0, max: number = 10) => {
-  min = Math.ceil(min);
-  max = Math.floor(max) + 1;
+const DEFAULT_WIDTH = 150;
+const DEFAULT_HEIGHT = 40;
 
-  return Math.floor(Math.random() * (max - min)) + min;
-};
+const DEFAULT_IMAGE = 'glimmer_40.png';
+const MAGIC_IMAGE = 'glimmer_text_40.png';
 
 export default class OhGlimmerGlimmer extends Component {
   private intervalId: number;
-  private imagePath: string;
   private allowedCoordinates: any;
 
   @tracked loading: boolean;
@@ -52,6 +45,15 @@ export default class OhGlimmerGlimmer extends Component {
     return this.mode === MODE_DEFAULT;
   }
 
+  @tracked('loading', 'isDefaultMode')
+  get buttonText() {
+    if (this.loading) {
+      return '...';
+    }
+
+    return this.isDefaultMode ? 'Magic Trick' : 'Default Mode';
+  }
+
   constructor(options) {
     super(options);
 
@@ -59,14 +61,13 @@ export default class OhGlimmerGlimmer extends Component {
     this.loading = false;
     this.mode = MODE_STATIC;
     this.intervalId = null;
-    this.rows = Array(40).fill(0);
-    this.columns = Array(150).fill(0);
+    this.rows = Array(DEFAULT_HEIGHT).fill(0);
+    this.columns = Array(DEFAULT_WIDTH).fill(0);
     this.state = STATE_PAUSED;
-    this.framePerSecond = 30;
-    this.updateAtOnceAmount = 40;
-    this.imagePath = 'glimmer_text_40.png';
+    this.framePerSecond = DEFAULT_FPS;
+    this.updateAtOnceAmount = DEFAULT_UPDATE_POINTS_AMOUNT;
 
-    this.renderImage('glimmer_40.png');
+    this.renderImage(DEFAULT_IMAGE);
   }
 
   private setupInterval() {
@@ -101,7 +102,7 @@ export default class OhGlimmerGlimmer extends Component {
             direction
           });
         } else {
-          data[rowIndex][columnIndex] = COLORS[getRandomInt(0, 6)];
+          data[rowIndex][columnIndex] = getRandomColor(0, 6);
         }
       }
     }
@@ -109,16 +110,12 @@ export default class OhGlimmerGlimmer extends Component {
 
   play() {
     this.state = STATE_PLAYING;
-
     this.setupInterval();
   }
 
   pause() {
     this.state = STATE_PAUSED;
-
     clearInterval(this.intervalId);
-
-    this.intervalId = null;
   }
 
   restart() {
@@ -149,8 +146,8 @@ export default class OhGlimmerGlimmer extends Component {
   setDefaultMode() {
     this.mode = MODE_DEFAULT;
 
-    this.rows = Array(40).fill(0);
-    this.columns = Array(150).fill(0);
+    this.rows = Array(DEFAULT_HEIGHT).fill(0);
+    this.columns = Array(DEFAULT_WIDTH).fill(0);
 
     let _allowedCoordinates = [];
 
@@ -165,7 +162,7 @@ export default class OhGlimmerGlimmer extends Component {
 
   doMagicTrick() {
     this.mode = MODE_MAGIC;
-    this.renderImage(this.imagePath);
+    this.renderImage(MAGIC_IMAGE);
   }
 
   private renderImage(imagePath) {
@@ -174,50 +171,14 @@ export default class OhGlimmerGlimmer extends Component {
 
     let image = new ImagePixelExtractor();
 
-    image.process(imagePath).then(({ image, data }) => {
-      const rows = Array(image.height).fill(0);
-      const columns = Array(image.width).fill(0);
-      let _data = [];
-      let _allowedCoordinates = [];
-
-      // iterate over all pixels based on x and y coordinates
-      for (let y = 0; y < image.height; y++) {
-        if (!_data[y]) {
-          _data[y] = [];
-        }
-
-        // loop through each column
-        for (let x = 0; x < image.width; x++) {
-          if (!_data[y][x]) {
-            _data[y][x] = [];
-          }
-
-          const r = data[((image.width * y) + x) * 4];
-          const g = data[((image.width * y) + x) * 4 + 1];
-          const b = data[((image.width * y) + x) * 4 + 2];
-          const a = Math.round((data[((image.width * y) + x) * 4 + 3] / 255) * 100) / 100;
-          const direction = getRandomInt(0, 1) === 1 ? 'up' : 'down';
-          const ignore = a <= 0.4 || (r === 255 && g === 255 && b === 255);
-          const color = `${r}, ${g}, ${b}, ${a}`;
-
-          if (!ignore) {
-            _allowedCoordinates.push([x, y])
-          }
-
-          _data[y][x] = {
-            style: `background: rgba(${color});`,
-            r, g, b, a, direction, ignore
-          };
-        }
-      }
-
+    image.process(imagePath).then(({ data, rows, columns, allowedCoordinates }) => {
       this.rows = rows;
       this.columns = columns;
-      this.data = _data;
-      this.allowedCoordinates = _allowedCoordinates;
+      this.data = data;
+      this.allowedCoordinates = allowedCoordinates;
+      this.loading = false;
 
       this.play();
-      this.loading = false;
     });
   }
 }
