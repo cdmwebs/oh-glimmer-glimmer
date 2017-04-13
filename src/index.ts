@@ -15,7 +15,7 @@ app.registerInitializer({
   }
 });
 
-app.renderComponent('oh-glimmer-glimmer', containerElement, null);
+app.renderComponent('app-component', containerElement, null);
 
 app.boot();
 initializeCustomElements(app, ['g-button']);
